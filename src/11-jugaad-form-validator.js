@@ -1,6 +1,6 @@
 /**
  * 📋 Jugaad Form Validator - Indian Style!
- *
+ *  
  * India mein form bharna ek art hai! College admission ka form validate
  * karna hai. Har field ke apne rules hain. Tujhe ek errors object return
  * karna hai jisme galat fields ke error messages hain. Agar sab sahi hai
@@ -62,5 +62,81 @@
  *   // => { isValid: false, errors: { name: "...", email: "...", ... } }
  */
 export function validateForm(formData) {
-  // Your code here
+  const errors = {};
+
+  if (typeof formData !== "object" || formData === null) {
+    return { isValid: false, errors: { form: "Invalid from data" } };
+  }
+
+  const { name, email, phone, age, pincode, state, agreeTerms } = formData;
+
+  if (
+    typeof name !== "string" ||
+    name.trim().length < 2 ||
+    name.trim().length > 50
+  ) {
+    errors.name = "Name must be 2-50 characters";
+  }
+
+  if (typeof email !== "string") {
+    errors.email = "Invalid email format";
+  } else {
+    const atIndex = email.indexOf("@");
+    const lastIndex = email.lastIndexOf("@");
+    const dotIndex = email.indexOf(".", atIndex);
+
+    if (atIndex <= 0 || atIndex !== lastIndex || dotIndex <= atIndex) {
+      errors.email = "Invalid email format";
+    }
+  }
+
+  if(typeof phone !== "string" || phone.length !== 10 || !"6789".includes(phone[0])){
+    errors.phone = "Invalid Indian phone number"
+  }
+  else {
+    for(let i =0; i <phone.length ; i++){
+      if(phone[i] < "0" || phone[i] > "9"){
+        errors.phone = "Invalid Indian phone number";
+        break;
+      }
+    }
+  }
+
+  let parsedAge = age;
+
+  if(typeof age === "string"){
+    parsedAge = parseInt(age)
+  }
+
+  if(typeof parsedAge !== "number" || isNaN(parsedAge) || !Number.isInteger(parsedAge) || parsedAge < 16 || parsedAge >100){
+    errors.age = "Age must be an integer between 16 and 100";
+  }
+
+  if(typeof pincode !== "string" ||pincode.length !== 6 || pincode.startsWith("0")){
+    errors.pincode = "Invalid Indian pincode"
+  }else {
+    for(let i =0 ; i< pincode.length ; i++){
+      if(pincode[i] < "0" || pincode[i] > "9"){
+        errors.pincode = "Invalid Indian pincode"
+        break;
+      }
+    }
+  }
+
+
+
+  const safeSate = state?.trim?.() ?? "";
+  if(typeof safeSate !== "string" || safeSate.length === 0){
+    errors.state = "State is required"
+  }
+
+  if(!Boolean(agreeTerms)){
+    errors.agreeTerms = "Must agree to terms";
+  }
+
+  return {
+    isValid:Object.keys(errors).length === 0,
+    errors
+  };
+
 }
